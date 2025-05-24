@@ -6,23 +6,22 @@ const {jwtAuthMiddleware, generateToken} = require('./../jwt');
 // POST route to add a person
 router.post('/signup', async (req, res) =>{
     try{
-        const data = req.body // Assuming the request body contains the User data
-
+        const data = req.body 
         // Check if there is already an admin user
         const adminUser = await User.findOne({ role: 'admin' });
         if (data.role === 'admin' && adminUser) {
             return res.status(400).json({ error: 'Admin user already exists' });
         }
 
-        // Validate Aadhar Card Number must have exactly 12 digit
-        if (!/^\d{12}$/.test(data.aadharCardNumber)) {
-            return res.status(400).json({ error: 'Aadhar Card Number must be exactly 12 digits' });
+        // Validate USN must have exactly 10 digit
+        if (!/^\d{10}$/.test(data.usn)) {
+            return res.status(400).json({ error: 'USN Number must be exactly 10 Characters' });
         }
 
-        // Check if a user with the same Aadhar Card Number already exists
-        const existingUser = await User.findOne({ aadharCardNumber: data.aadharCardNumber });
+        // Check if a user with the same USN already exists
+        const existingUser = await User.findOne({ usn: data.usn });
         if (existingUser) {
-            return res.status(400).json({ error: 'User with the same Aadhar Card Number already exists' });
+            return res.status(400).json({ error: 'User with the same USN  already exists' });
         }
 
         // Create a new User document using the Mongoose model
@@ -49,20 +48,20 @@ router.post('/signup', async (req, res) =>{
 // Login Route
 router.post('/login', async(req, res) => {
     try{
-        // Extract aadharCardNumber and password from request body
-        const {aadharCardNumber, password} = req.body;
+        // Extract USN and password from request body
+        const {usn, password} = req.body;
 
-        // Check if aadharCardNumber or password is missing
-        if (!aadharCardNumber || !password) {
-            return res.status(400).json({ error: 'Aadhar Card Number and password are required' });
+        // Check if USN or password is missing
+        if (!usn || !password) {
+            return res.status(400).json({ error: 'USN and password are required' });
         }
 
-        // Find the user by aadharCardNumber
-        const user = await User.findOne({aadharCardNumber: aadharCardNumber});
+        // Find the user by USN
+        const user = await User.findOne({usn: usn});
 
         // If user does not exist or password does not match, return error
         if( !user || !(await user.comparePassword(password))){
-            return res.status(401).json({error: 'Invalid Aadhar Card Number or Password'});
+            return res.status(401).json({error: 'Invalid USN or Password'});
         }
 
         // generate Token 

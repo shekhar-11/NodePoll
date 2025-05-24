@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/user');
-const {jwtAuthMiddleware, generateToken} = require('../jwt');
+const {jwtAuthMiddleware} = require('../jwt');
 const Candidate = require('../models/candidate');
 
 
@@ -16,6 +16,28 @@ const checkAdminRole = async (userID) => {
    }
 }
 
+//votes count
+router.get('/vote/count', async (req, res) => {
+    try{
+        
+        const candidate = await Candidate.find().sort({voteCount: 'desc'});
+
+       
+        const voteRecord = candidate.map((data)=>{
+            return {
+                name: data.name,
+                count: data.voteCount
+            }
+        });
+
+        return res.status(200).json(voteRecord);
+    }catch(err){
+        console.log(err);
+        res.status(500).json({error: 'Internal Server Error'});
+    }
+});
+
+
 // POST route to add a candidate
 router.post('/', jwtAuthMiddleware, async (req, res) =>{
     try{
@@ -24,10 +46,10 @@ router.post('/', jwtAuthMiddleware, async (req, res) =>{
 
         const data = req.body // Assuming the request body contains the candidate data
 
-        // Create a new User document using the Mongoose model
+       
         const newCandidate = new Candidate(data);
 
-        // Save the new user to the database
+      
         const response = await newCandidate.save();
         console.log('data saved');
         res.status(200).json({response: response});
@@ -47,8 +69,8 @@ router.put('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
         const updatedCandidateData = req.body; // Updated data for the person
 
         const response = await Candidate.findByIdAndUpdate(candidateID, updatedCandidateData, {
-            new: true, // Return the updated document
-            runValidators: true, // Run Mongoose validation
+            new: true, 
+            runValidators: true, 
         })
 
         if (!response) {
@@ -84,7 +106,7 @@ router.delete('/:candidateID', jwtAuthMiddleware, async (req, res)=>{
     }
 })
 
-// let's start voting
+//  voting
 router.get('/vote/:candidateID', jwtAuthMiddleware, async (req, res)=>{
     // no admin can vote
     // user can only vote once
@@ -126,34 +148,13 @@ router.get('/vote/:candidateID', jwtAuthMiddleware, async (req, res)=>{
     }
 });
 
-// vote count 
-router.get('/vote/count', async (req, res) => {
-    try{
-        // Find all candidates and sort them by voteCount in descending order
-        const candidate = await Candidate.find().sort({voteCount: 'desc'});
 
-        // Map the candidates to only return their name and voteCount
-        const voteRecord = candidate.map((data)=>{
-            return {
-                party: data.party,
-                count: data.voteCount
-            }
-        });
-
-        return res.status(200).json(voteRecord);
-    }catch(err){
-        console.log(err);
-        res.status(500).json({error: 'Internal Server Error'});
-    }
-});
-
-// Get List of all candidates with only name and party fields
 router.get('/', async (req, res) => {
     try {
-        // Find all candidates and select only the name and party fields, excluding _id
-        const candidates = await Candidate.find({}, 'name party -_id');
+      
+        const candidates = await Candidate.find({}, 'name -_id');
 
-        // Return the list of candidates
+       
         res.status(200).json(candidates);
     } catch (err) {
         console.error(err);
