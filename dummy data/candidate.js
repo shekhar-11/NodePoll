@@ -1,27 +1,15 @@
 [
     {
-        "name": "Narendra Modi",
-        "party": "BJP",
-        "age": 71
+        "name": "Rahul",
+        "age": 21
     },
     {
-        "name": "Rahul Gandhi",
-        "party": "INC",
-        "age": 51
+        "name": "Rohit",
+        "age": 21
     },
     {
-        "name": "Arvind Kejriwal",
-        "party": "AAP",
-        "age": 53
-    },
-    {
-        "name": "Mamata Banerjee",
-        "party": "AITC",
-        "age": 67
-    },
-    {
-        "name": "Yogi Adityanath",
-        "party": "BJP",
-        "age": 49
+        "name": "Raj",
+        
+        "age": 22
     }
 ]
